@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Operating Kit — A Walkthrough for Mark</title>
+<meta name="description" content="A step-by-step walkthrough of the AI Operating Kit: what it is, how to set it up, and how it helps you use AI with discipline instead of chaos.">
+<style>
+  :root {
+    --bg:      #ffffff;
+    --ink:     #111111;
+    --muted:   #666666;
+    --line:    #e4e4e4;
+    --line-2:  #d0d0d0;
+    --accent:  #e30613;
+    --panel:   #f6f6f4;
+    --code-bg: #f2f2f0;
+    --maxw:    1120px;
+    --gap:     24px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #0d0d0d;
+      --ink:     #f3f3f1;
+      --muted:   #9a9a9a;
+      --line:    #262626;
+      --line-2:  #363636;
+      --accent:  #ff4438;
+      --panel:   #161615;
+      --code-bg: #1a1a19;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:#ffffff; --ink:#111111; --muted:#666666; --line:#e4e4e4; --line-2:#d0d0d0;
+    --accent:#e30613; --panel:#f6f6f4; --code-bg:#f2f2f0;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0d0d0d; --ink:#f3f3f1; --muted:#9a9a9a; --line:#262626; --line-2:#363636;
+    --accent:#ff4438; --panel:#161615; --code-bg:#1a1a19;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    letter-spacing: -0.006em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Let grid/flex children shrink below their content's intrinsic min-size so
+     wide items (tables, code) scroll inside their own container, not the body. */
+  .body-grid > .col, ol.steps .st, .sec-head > div { min-width: 0; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 28px; }
+
+  a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line-2); }
+  a:hover { color: var(--accent); border-color: var(--accent); }
+  code, pre, kbd {
+    font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+    font-size: 0.86em;
+  }
+
+  /* ---- Top bar ---------------------------------------------------------- */
+  .topbar {
+    border-bottom: 2px solid var(--ink);
+    position: sticky; top: 0; z-index: 20;
+    background: var(--bg);
+  }
+  .topbar .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding-top: 14px; padding-bottom: 14px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand .mark {
+    display: inline-block; width: 13px; height: 13px;
+    background: var(--accent); flex: none; transform: translateY(1px);
+  }
+  .brand strong { font-size: 15px; letter-spacing: 0.02em; text-transform: uppercase; }
+  .topbar nav { display: flex; gap: 22px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .topbar nav a { border: none; color: var(--muted); }
+  .topbar nav a:hover { color: var(--accent); }
+  @media (max-width: 720px){ .topbar nav { display: none; } }
+
+  /* ---- Hero ------------------------------------------------------------- */
+  .hero { padding: 64px 0 40px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--accent); margin: 0 0 22px;
+  }
+  .hero h1 {
+    font-size: clamp(38px, 7vw, 76px);
+    line-height: 0.98; letter-spacing: -0.02em; font-weight: 700;
+    margin: 0 0 26px; max-width: 15ch;
+  }
+  .lede { font-size: clamp(18px, 2.3vw, 23px); line-height: 1.4; max-width: 46ch; color: var(--ink); margin: 0 0 14px; }
+  .lede .tag { color: var(--muted); }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .btn {
+    display: inline-block; border: 1.5px solid var(--ink); color: var(--ink);
+    padding: 12px 20px; font-size: 14px; letter-spacing: 0.02em; text-transform: uppercase;
+    background: transparent;
+  }
+  .btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: transparent; color: var(--accent); }
+
+  /* ---- Section scaffolding --------------------------------------------- */
+  section { padding: 58px 0; border-bottom: 1px solid var(--line); }
+  .sec-head { display: grid; grid-template-columns: 96px 1fr; gap: var(--gap); align-items: start; margin-bottom: 34px; }
+  .sec-num { font-size: 14px; color: var(--accent); font-weight: 700; letter-spacing: 0.04em; padding-top: 6px; }
+  .sec-head h2 { font-size: clamp(24px, 3.4vw, 34px); line-height: 1.05; letter-spacing: -0.015em; margin: 0; max-width: 24ch; }
+  .sec-head p.sub { grid-column: 2; color: var(--muted); margin: 12px 0 0; max-width: 60ch; }
+  @media (max-width: 640px){
+    .sec-head { grid-template-columns: 1fr; gap: 8px; }
+    .sec-head p.sub, .sec-head h2 { grid-column: 1; }
+  }
+
+  .body-grid { display: grid; grid-template-columns: 96px 1fr; gap: var(--gap); }
+  .body-grid > .col { grid-column: 2; }
+  @media (max-width: 640px){ .body-grid { grid-template-columns: 1fr; } .body-grid > .col { grid-column: 1; } }
+
+  p { margin: 0 0 16px; }
+  .prose { max-width: 62ch; }
+
+  /* ---- Benefit / card grids -------------------------------------------- */
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .cards .card { background: var(--bg); padding: 24px; }
+  .cards .card h3 { margin: 0 0 8px; font-size: 17px; letter-spacing: -0.01em; }
+  .cards .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  @media (max-width: 640px){ .cards { grid-template-columns: 1fr; } }
+
+  /* ---- Core four -------------------------------------------------------- */
+  .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .four .item { background: var(--bg); padding: 22px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .four .item .cmd { color: var(--accent); font-weight: 700; font-size: 15px; }
+  .four .item h3 { margin: 0; font-size: 16px; }
+  .four .item p { margin: 0; font-size: 14px; color: var(--muted); }
+  @media (max-width: 860px){ .four { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px){ .four { grid-template-columns: 1fr; } }
+
+  /* ---- Steps ------------------------------------------------------------ */
+  ol.steps { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+  ol.steps > li {
+    counter-increment: step;
+    display: grid; grid-template-columns: 96px 1fr; gap: var(--gap);
+    padding: 26px 0; border-top: 1px solid var(--line);
+  }
+  ol.steps > li:first-child { border-top: none; }
+  ol.steps > li::before {
+    content: counter(step, decimal-leading-zero);
+    font-size: 14px; font-weight: 700; color: var(--accent); padding-top: 3px;
+  }
+  ol.steps .st h3 { margin: 0 0 6px; font-size: 19px; letter-spacing: -0.01em; }
+  ol.steps .st p { margin: 0 0 12px; color: var(--muted); max-width: 58ch; }
+  @media (max-width: 640px){
+    ol.steps > li { grid-template-columns: 1fr; gap: 6px; }
+    ol.steps > li::before { padding-top: 0; }
+  }
+
+  pre {
+    background: var(--code-bg); border: 1px solid var(--line);
+    padding: 14px 16px; overflow-x: auto; margin: 0 0 6px; line-height: 1.5;
+    border-left: 2px solid var(--accent);
+  }
+  pre code { color: var(--ink); }
+  .hint { font-size: 13px; color: var(--muted); }
+  kbd {
+    background: var(--panel); border: 1px solid var(--line-2); border-bottom-width: 2px;
+    border-radius: 4px; padding: 1px 6px; color: var(--ink);
+  }
+
+  /* ---- Inventory table -------------------------------------------------- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 15px; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1.5px solid var(--ink); }
+  tbody tr:last-child td { border-bottom: none; }
+  td .count { color: var(--accent); font-weight: 700; }
+
+  /* ---- Callout ---------------------------------------------------------- */
+  .callout { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--accent); padding: 20px 22px; }
+  .callout h3 { margin: 0 0 8px; font-size: 16px; }
+  .callout p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* ---- Links row -------------------------------------------------------- */
+  .links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .links a { background: var(--bg); padding: 22px 20px; border: none; display: block; }
+  .links a:hover { background: var(--panel); color: var(--ink); }
+  .links a .k { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+  .links a .v { display: block; font-size: 17px; letter-spacing: -0.01em; }
+  .links a:hover .v { color: var(--accent); }
+  @media (max-width: 720px){ .links { grid-template-columns: 1fr; } }
+
+  /* ---- Footer ----------------------------------------------------------- */
+  footer { padding: 46px 0 70px; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: baseline; }
+  footer .fnote { color: var(--muted); font-size: 13px; max-width: 60ch; }
+  footer .repo { font-size: 14px; }
+
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 12px; top: 12px; background: var(--accent); color:#fff; padding: 8px 12px; z-index: 50; }
+</style>
+</head>
+<body>
+<a class="skip" href="#start">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="mark" aria-hidden="true"></span><strong>AI Operating Kit</strong></div>
+    <nav aria-label="Sections">
+      <a href="#what">What</a>
+      <a href="#core">Core Four</a>
+      <a href="#setup">Setup</a>
+      <a href="#inside">Inside</a>
+      <a href="#links">Links</a>
+    </nav>
+  </div>
+</header>
+
+<main id="start">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <p class="eyebrow">A Walkthrough for Mark</p>
+      <h1>Use AI with discipline, not chaos.</h1>
+      <p class="lede">The AI Operating Kit is a lightweight, Markdown-first operating system for working with AI.</p>
+      <p class="lede tag"><strong>AI is not the job. AI is the leverage layer.</strong></p>
+      <div class="hero-actions">
+        <a class="btn primary" href="https://github.com/aaronlemay/ai-operating-kit">Open the Repo</a>
+        <a class="btn" href="#setup">Start the 15-min Setup</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 01 WHAT -->
+  <section id="what">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">01</div>
+        <div>
+          <h2>What it is, and why it helps you</h2>
+          <p class="sub">No Node, no Python, no npm, no accounts. Just a few Markdown files you drop into a project so any AI assistant — Claude, Claude Code, ChatGPT, Codex — works the same disciplined way every time.</p>
+        </div>
+      </div>
+      <div class="body-grid">
+        <div class="col">
+          <div class="prose">
+            <p>Most people use AI reactively: they open a chat, start building, and three hours later have an impressive-looking thing nobody needed. The kit puts a thin layer of discipline in front of that impulse — spec before you build, check ROI before you spend, protect data before you paste, and preserve context so nothing gets lost between sessions.</p>
+            <p>It's built for operators: studio and production leaders, executives, and producers who need AI to be leverage on the real work, not a new full-time job.</p>
+          </div>
+          <div class="cards" style="margin-top:26px">
+            <div class="card"><h3>Spec before you build</h3><p>Force clarity on the problem, the user, and the smallest useful version before writing a line.</p></div>
+            <div class="card"><h3>Kill the side quests</h3><p>ROI and survival filters catch busywork before it eats a week.</p></div>
+            <div class="card"><h3>Protect what matters</h3><p>A cleanroom check guards client data, IP, and account boundaries.</p></div>
+            <div class="card"><h3>Never lose context</h3><p>Wrap-ups and project memory carry decisions across sessions and tools.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 CORE FOUR -->
+  <section id="core">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">02</div>
+        <div>
+          <h2>Start with the core four</h2>
+          <p class="sub">Each “skill” is just a Markdown file with a copy-paste prompt. Open it, copy the prompt, paste it into your AI assistant. These four cover most of the value on day one.</p>
+        </div>
+      </div>
+      <div class="body-grid">
+        <div class="col">
+          <div class="four">
+            <div class="item"><span class="cmd">/wrapup</span><h3>Close cleanly</h3><p>Condense a long session into a clean restart packet.</p></div>
+            <div class="item"><span class="cmd">/spec-first</span><h3>Clarity first</h3><p>Define the problem before jumping into build mode.</p></div>
+            <div class="item"><span class="cmd">/roi-check</span><h3>Worth it?</h3><p>Build now, prototype, defer, kill, or do it manually first.</p></div>
+            <div class="item"><span class="cmd">/cleanroom</span><h3>Protect data</h3><p>Guard IP, client data, and account boundaries before pasting.</p></div>
+          </div>
+          <div class="callout" style="margin-top:26px">
+            <h3>Pocket version</h3>
+            <p>There are printable cut-out cards for these four in <a href="https://github.com/aaronlemay/ai-operating-kit/blob/main/docs/checklist-cards.md">docs/checklist-cards.md</a> — print it, keep it on your desk.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 SETUP -->
+  <section id="setup">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">03</div>
+        <div>
+          <h2>Set it up in about 15 minutes</h2>
+          <p class="sub">Do this once on one real project. Understanding comes from using it, not from reading the whole kit first.</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li>
+          <div class="st">
+            <h3>Clone the repo</h3>
+            <p>Grab the kit from GitHub.</p>
+            <pre><code>git clone https://github.com/aaronlemay/ai-operating-kit.git
+cd ai-operating-kit</code></pre>
+          </div>
+        </li>
+        <li>
+          <div class="st">
+            <h3>Install it into your project</h3>
+            <p>One command copies the skills, templates, and the <code>CLAUDE.md</code> operating rules into your project (and safely backs up any existing <code>CLAUDE.md</code>).</p>
+            <pre><code>./scripts/install.sh /path/to/your/project</code></pre>
+            <p class="hint">Using ChatGPT instead? Paste <code>CLAUDE.md</code> into its Custom Instructions so the rules stay active.</p>
+          </div>
+        </li>
+        <li>
+          <div class="st">
+            <h3>Start with <span style="color:var(--accent)">/wrapup</span></h3>
+            <p>If you're mid-project, capture where you are first. Open <code>skills/wrapup.md</code>, copy the prompt, paste it in with your recent notes. You get back a clean restart packet — objective, status, decisions, risks, next actions.</p>
+          </div>
+        </li>
+        <li>
+          <div class="st">
+            <h3>Run <span style="color:var(--accent)">/spec-first</span> on one real idea</h3>
+            <p>Pick something you're tempted to build. The skill forces out the smallest useful version and a do-not-build list. Most ideas shrink — that's the point.</p>
+          </div>
+        </li>
+        <li>
+          <div class="st">
+            <h3>Pressure-test with <span style="color:var(--accent)">/roi-check</span></h3>
+            <p>Paste your spec in and get a straight recommendation: build now, prototype, defer, kill, use an existing tool, or write a manual SOP first.</p>
+          </div>
+        </li>
+        <li>
+          <div class="st">
+            <h3>Guard data with <span style="color:var(--accent)">/cleanroom</span></h3>
+            <p>Before any client data, IP, or credentials touch an AI tool, run the checklist. It ends in a clear <strong>GO / NO-GO</strong>.</p>
+          </div>
+        </li>
+        <li>
+          <div class="st">
+            <h3>Close with <span style="color:var(--accent)">/task-ledger</span></h3>
+            <p>Turn everything you decided into a prioritized action list: Priority · Task · Owner · Status · Next Action · Blocker · Due.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="callout" style="margin-top:30px">
+        <h3>The everyday flow</h3>
+        <p><code>/spec-first → /roi-check → /cleanroom → build or hand off → /wrapup</code>. Spec it, prove it's worth doing, protect the data, do the work, close cleanly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 INSIDE -->
+  <section id="inside">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">04</div>
+        <div>
+          <h2>What's inside the kit</h2>
+          <p class="sub">Everything is Markdown. Read what you need, ignore the rest, adapt it to your studio.</p>
+        </div>
+      </div>
+      <div class="body-grid">
+        <div class="col">
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Folder</th><th>Count</th><th>What it gives you</th></tr></thead>
+              <tbody>
+                <tr><td><a href="https://github.com/aaronlemay/ai-operating-kit/tree/main/skills">skills/</a></td><td><span class="count">12</span></td><td>Reusable copy-paste prompt protocols — the core of the kit.</td></tr>
+                <tr><td><a href="https://github.com/aaronlemay/ai-operating-kit/tree/main/templates">templates/</a></td><td><span class="count">11</span></td><td>Fill-in-the-blank working documents: briefs, ledgers, scorecards, policies.</td></tr>
+                <tr><td><a href="https://github.com/aaronlemay/ai-operating-kit/tree/main/docs">docs/</a></td><td><span class="count">8</span></td><td>Executive and studio guides on discipline, routing, governance, and survival.</td></tr>
+                <tr><td><a href="https://github.com/aaronlemay/ai-operating-kit/tree/main/examples">examples/</a></td><td><span class="count">6</span></td><td>Fictional worked examples — cost truth, forecasting, pipelines, and more.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="hint" style="margin-top:14px">Beyond the core four, the kit also includes <code>/model-router</code>, <code>/survival-filter</code>, <code>/forecast-check</code>, <code>/decision-log</code>, <code>/handoff-to-cowork</code>, <code>/meeting-synthesis</code>, and <code>/project-memory</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 LINKS -->
+  <section id="links">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-num">05</div>
+        <div>
+          <h2>Jump straight in</h2>
+          <p class="sub">Everything you need is in the repo.</p>
+        </div>
+      </div>
+      <div class="body-grid">
+        <div class="col">
+          <div class="links">
+            <a href="https://github.com/aaronlemay/ai-operating-kit"><span class="k">Repository</span><span class="v">github.com/aaronlemay/ai-operating-kit</span></a>
+            <a href="https://github.com/aaronlemay/ai-operating-kit/blob/main/README.md"><span class="k">Overview</span><span class="v">README.md</span></a>
+            <a href="https://github.com/aaronlemay/ai-operating-kit/blob/main/QUICKSTART.md"><span class="k">15-minute setup</span><span class="v">QUICKSTART.md</span></a>
+            <a href="https://github.com/aaronlemay/ai-operating-kit/blob/main/INSTALL.md"><span class="k">Install & any assistant</span><span class="v">INSTALL.md</span></a>
+            <a href="https://github.com/aaronlemay/ai-operating-kit/tree/main/skills"><span class="k">The skills</span><span class="v">skills/</span></a>
+            <a href="https://github.com/aaronlemay/ai-operating-kit/blob/main/docs/checklist-cards.md"><span class="k">Printable</span><span class="v">Checklist cards</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fnote">
+      <strong>A note on data:</strong> the public kit is intentionally generic — no real company, client, or financial details. Keep company-specific adaptations in a private copy, and run <code>/cleanroom</code> before pasting anything sensitive. Nothing here is legal, tax, or financial advice; outputs are decision-support only.
+    </div>
+    <div class="repo"><a href="https://github.com/aaronlemay/ai-operating-kit">github.com/aaronlemay/ai-operating-kit ↗</a></div>
+  </div>
+</footer>
+
+</body>
+</html>
