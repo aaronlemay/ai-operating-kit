@@ -17,6 +17,7 @@ These are prose guides, not code. Nothing here requires Node, Python, or npm. Re
 | [executive-ai-workflow.md](executive-ai-workflow.md) | A concrete daily and weekly rhythm for running your work with AI, from morning planning to weekly project-memory sync. |
 | [studio-ai-governance.md](studio-ai-governance.md) | Practical studio policy: approved tools, client work, personal vs. company accounts, contractors, telemetry, review, incident response. |
 | [avoiding-ai-side-quests.md](avoiding-ai-side-quests.md) | How AI manufactures false productivity, the warning signs, and a short recovery protocol. |
+| [checklist-cards.md](checklist-cards.md) | Printable one-page cut-out cards for the core four skills — `/wrapup`, `/spec-first`, `/roi-check`, `/cleanroom`. |
 
 ## Suggested reading order
 

@@ -80,6 +80,8 @@ Start here. These four cover 80% of the value on day one.
 3. **[`/roi-check`](skills/roi-check.md)** — decide whether the work is worth doing
 4. **[`/cleanroom`](skills/cleanroom.md)** — protect IP, client data, and account boundaries
 
+> Want the pocket version? [docs/checklist-cards.md](docs/checklist-cards.md) has printable one-page cut-out cards for all four.
+
 ---
 
 ## Repo Structure
