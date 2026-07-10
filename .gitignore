@@ -1,0 +1,51 @@
+# AI Operating Kit — .gitignore
+#
+# The public kit is intentionally generic. This file helps keep company-specific
+# adaptations, real data, and filled-in templates OUT of a public repo.
+# In your PRIVATE fork you may choose to remove some of these rules.
+
+# --- Private, company-specific, or real-data files -------------------------
+# Anything you tag as private stays untracked.
+*-private.md
+*.private.md
+/_private/
+/private/
+/confidential/
+
+# Filled-in working copies of templates (keep the blank templates, ignore real ones)
+*-filled.md
+*.filled.md
+/_working/
+
+# Real data exports, financials, forecasts, ledgers with actual numbers
+*.csv
+*.xlsx
+*.xls
+*.numbers
+/exports/
+/data/
+
+# --- Secrets & credentials (never commit) ----------------------------------
+.env
+.env.*
+*.key
+*.pem
+*.pfx
+credentials*.json
+secrets*.json
+*-secrets.*
+
+# --- Script backups created by install.sh ----------------------------------
+CLAUDE.md.bak.*
+*.bak
+*.bak.*
+
+# --- OS / editor cruft -----------------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
